@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCSサポート マニュアルポータル</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Hiragino Sans", "Meiryo", sans-serif;
+      background: #f0f4f8;
+      color: #1a202c;
+      min-height: 100vh;
+    }
+
+    /* ヘッダー */
+    header {
+      background: linear-gradient(135deg, #1a56db, #1e40af);
+      color: white;
+      padding: 20px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    header p {
+      font-size: 0.85rem;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+
+    /* ナレッジバナー */
+    .knowledge-banner {
+      background: #fef3c7;
+      border-bottom: 3px solid #f59e0b;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .knowledge-banner .label {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .knowledge-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f59e0b;
+      color: white;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 10px 22px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 2px 6px rgba(245,158,11,0.4);
+    }
+    .knowledge-btn:hover {
+      background: #d97706;
+      transform: translateY(-1px);
+    }
+    .knowledge-btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    /* 検索 */
+    .search-wrap {
+      padding: 20px 24px 0;
+      max-width: 480px;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239ca3af' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.44 1.406a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E") no-repeat 12px center;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-wrap input:focus {
+      border-color: #1a56db;
+    }
+
+    /* グリッド */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 20px 24px 40px;
+    }
+
+    /* カード */
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      transform: translateY(-2px);
+    }
+    .card-header {
+      padding: 14px 16px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+    }
+    .card-header .icon { font-size: 1.2rem; }
+
+    /* カテゴリー別カラー */
+    .cat-0 .card-header { background: #4f46e5; }
+    .cat-1 .card-header { background: #0891b2; }
+    .cat-2 .card-header { background: #059669; }
+    .cat-3 .card-header { background: #7c3aed; }
+    .cat-4 .card-header { background: #dc2626; }
+    .cat-5 .card-header { background: #ea580c; }
+    .cat-6 .card-header { background: #0369a1; }
+    .cat-7 .card-header { background: #64748b; }
+
+    .card ul {
+      list-style: none;
+      padding: 8px 0;
+    }
+    .card ul li {
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .card ul li:last-child { border-bottom: none; }
+    .card ul li a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 16px;
+      text-decoration: none;
+      color: #1e40af;
+      font-size: 0.875rem;
+      transition: background 0.15s;
+    }
+    .card ul li a:hover {
+      background: #eff6ff;
+    }
+    .card ul li a::before {
+      content: "▶";
+      font-size: 0.6rem;
+      color: #93c5fd;
+      flex-shrink: 0;
+    }
+
+    /* 非表示（検索フィルタ） */
+    .card.hidden { display: none; }
+    .item-hidden { display: none !important; }
+
+    /* 空メッセージ */
+    .no-results {
+      display: none;
+      text-align: center;
+      color: #6b7280;
+      padding: 48px;
+      font-size: 1rem;
+      grid-column: 1/-1;
+    }
+    .no-results.show { display: block; }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.2rem; }
+      .grid { padding: 16px; gap: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📋 PCSサポート マニュアルポータル</h1>
+  <p>各カテゴリーのマニュアルへのリンク集です。クリックすると Google ドライブが開きます。</p>
+</header>
+
+<!-- ナレッジベース バナー -->
+<div class="knowledge-banner">
+  <span class="label">💡 ナレッジベース</span>
+  <a class="knowledge-btn"
+     href="https://docs.google.com/spreadsheets/d/1JaVObpnlKsNq8ShJwy46oeIqbQbt7MVnIgRvBZ6kns8/edit?gid=1132819278#gid=1132819278"
+     target="_blank" rel="noopener">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/>
+      <line x1="16" y1="17" x2="8" y2="17"/>
+      <polyline points="10 9 9 9 8 9"/>
+    </svg>
+    ナレッジベースを開く
+  </a>
+  <span style="font-size:0.8rem;color:#78350f;">よくある対応事例・Tips をまとめたシートです</span>
+</div>
+
+<!-- 検索 -->
+<div class="search-wrap">
+  <input type="text" id="search" placeholder="マニュアル名・カテゴリーで検索…" oninput="filterCards()">
+</div>
+
+<!-- カテゴリーグリッド -->
+<div class="grid" id="grid">
+
+  <!-- 同封マニュアル -->
+  <div class="card cat-0" data-category="同封マニュアル">
+    <div class="card-header"><span class="icon">📦</span>同封マニュアル</div>
+    <ul>
+      <li><a href="https://drive.google.com/drive/u/0/folders/1LTKGwEFIKfcwi7PXdaUHF6oz2RdDR0LP" target="_blank" rel="noopener">設置時にやること</a></li>
+      <li><a href="https://drive.google.com/drive/u/0/folders/1LTKGwEFIKfcwi7PXdaUHF6oz2RdDR0LP" target="_blank" rel="noopener">ファイル共有マニュアル</a></li>
+    </ul>
+  </div>
+
+  <!-- PC設定 -->
+  <div class="card cat-1" data-category="PC設定">
+    <div class="card-header"><span class="icon">💻</span>PC設定</div>
+    <ul>
+      <li><a href="https://docs.google.com/document/d/10xxN9On5Ela_W3DbHmYqqMVYWdJ-TRUE/edit" target="_blank" rel="noopener">VPN設定</a></li>
+      <li><a href="https://docs.google.com/document/d/1BmP4ESho1SkcrKl0ikz_Eqsz_o6mI-2L/edit" target="_blank" rel="noopener">共有フォルダアクセス方法</a></li>
+    </ul>
+  </div>
+
+  <!-- データ復元 -->
+  <div class="card cat-2" data-category="データ復元">
+    <div class="card-header"><span class="icon">🔄</span>データ復元</div>
+    <ul>
+      <li><a href="https://docs.google.com/document/d/1LHMQo8eSDiy34e5d1aZXuo-uv7KsCLBZ/edit" target="_blank" rel="noopener">M3世代バックアップからの復元</a></li>
+      <li><a href="https://docs.google.com/document/d/10zTwVJHQ36PWoXO84Ow569v6Ohk2qM4Q/edit" target="_blank" rel="noopener">M5世代バックアップからの復元</a></li>
+    </ul>
+  </div>
+
+  <!-- VPN -->
+  <div class="card cat-3" data-category="VPN">
+    <div class="card-header"><span class="icon">🔒</span>VPN</div>
+    <ul>
+      <li><a href="https://docs.google.com/document/d/1QQ3ROVEU0YiAtuaCZx_pfsX90WX99g29/edit" target="_blank" rel="noopener">LAN2本差し設定</a></li>
+    </ul>
+  </div>
+
+  <!-- M3 HDD交換 -->
+  <div class="card cat-4" data-category="M3 HDD交換">
+    <div class="card-header"><span class="icon">🖴</span>M3 HDD交換</div>
+    <ul>
+      <li><a href="https://drive.google.com/drive/u/0/folders/1DeTgNCPNaFEKScX9hc2SIX2VDLp5Hh6a" target="_blank" rel="noopener">M3 HDD交換マニュアル RAID1用</a></li>
+      <li><a href="https://drive.google.com/drive/u/0/folders/1DeTgNCPNaFEKScX9hc2SIX2VDLp5Hh6a" target="_blank" rel="noopener">M3 HDD交換マニュアル 世代用</a></li>
+    </ul>
+  </div>
+
+  <!-- M5 HDD交換 -->
+  <div class="card cat-5" data-category="M5 HDD交換">
+    <div class="card-header"><span class="icon">🖴</span>M5 HDD交換</div>
+    <ul>
+      <li><a href="https://drive.google.com/drive/u/0/folders/1L-ye4aG2_yOnYFck_9yR2fc5fUqJiv0B" target="_blank" rel="noopener">M5 HDD交換マニュアル 世代用</a></li>
+      <li><a href="https://docs.google.com/document/d/12PzrUqgR6PLYBZBbQTiy4rKYwbqfl74y/edit" target="_blank" rel="noopener">M5 HDD交換マニュアル RAID1用</a></li>
+    </ul>
+  </div>
+
+  <!-- Windowsサーバー -->
+  <div class="card cat-6" data-category="Windowsサーバー">
+    <div class="card-header"><span class="icon">🖥️</span>Windowsサーバー</div>
+    <ul>
+      <li><a href="https://docs.google.com/document/d/1jTqoO1DpX8wVv34VWllh7tbNzlbjTQZC/edit" target="_blank" rel="noopener">フォルダ・ユーザー作成と権限設定</a></li>
+      <li><a href="https://docs.google.com/document/d/1z8myS22jOwmI1nc5SogwRIuvR49O3Hze/edit" target="_blank" rel="noopener">データ復元</a></li>
+    </ul>
+  </div>
+
+  <!-- その他 -->
+  <div class="card cat-7" data-category="その他">
+    <div class="card-header"><span class="icon">📁</span>その他</div>
+    <ul>
+      <li><a href="https://docs.google.com/document/d/1BXtEbS-8kPyjW6MxePHIUZ_yVgIkPDoD/edit#heading=h.2n2814djuom9" target="_blank" rel="noopener">世代バックアップ停止</a></li>
+    </ul>
+  </div>
+
+  <div class="no-results" id="noResults">該当するマニュアルが見つかりませんでした。</div>
+</div>
+
+<script>
+  function filterCards() {
+    const q = document.getElementById('search').value.trim().toLowerCase();
+    const cards = document.querySelectorAll('.card');
+    let anyVisible = false;
+
+    cards.forEach(card => {
+      const cat = card.dataset.category.toLowerCase();
+      const items = card.querySelectorAll('li a');
+      let cardMatch = cat.includes(q);
+      let itemMatch = false;
+
+      items.forEach(a => {
+        const text = a.textContent.toLowerCase();
+        if (!q || text.includes(q) || cat.includes(q)) {
+          a.closest('li').classList.remove('item-hidden');
+          itemMatch = true;
+        } else {
+          a.closest('li').classList.add('item-hidden');
+        }
+      });
+
+      if (!q || cardMatch || itemMatch) {
+        card.classList.remove('hidden');
+        anyVisible = true;
+        // カテゴリー一致の場合は全items表示
+        if (cardMatch && q) {
+          items.forEach(a => a.closest('li').classList.remove('item-hidden'));
+        }
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+
+    document.getElementById('noResults').classList.toggle('show', !anyVisible && q !== '');
+  }
+</script>
+
+</body>
+</html>
