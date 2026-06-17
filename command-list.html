@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>コマンドリスト — PCSサポート</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Hiragino Sans", "Meiryo", sans-serif;
+      background: #f0f4f8;
+      color: #1a202c;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a56db, #1e40af);
+      color: white;
+      padding: 18px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    header h1 { font-size: 1.3rem; font-weight: 700; }
+    .back-link {
+      color: #bfdbfe;
+      font-size: 0.85rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .back-link:hover { color: white; }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 20px 48px;
+    }
+
+    /* 検索 */
+    .search-wrap {
+      margin-bottom: 20px;
+      max-width: 400px;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239ca3af' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.44 1.406a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E") no-repeat 12px center;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+    .search-wrap input:focus { border-color: #1a56db; }
+
+    /* テーブルラッパー */
+    .table-section {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    /* カテゴリーヘッダー行 */
+    .cat-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: white;
+    }
+    .cat-network  { background: #2563eb; }
+    .cat-disk     { background: #059669; }
+    .cat-system   { background: #7c3aed; }
+    .cat-dir      { background: #0891b2; }
+    .cat-backup   { background: #dc2626; }
+
+    /* コマンド行 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead tr {
+      background: #f8fafc;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 0.78rem;
+      color: #64748b;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.12s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f8fafc; }
+    tbody tr.hidden { display: none; }
+
+    td {
+      padding: 10px 14px;
+      vertical-align: middle;
+      font-size: 0.875rem;
+    }
+
+    /* コマンドセル */
+    .cmd-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cmd-text {
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 0.85rem;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      padding: 3px 8px;
+      color: #1e40af;
+      white-space: nowrap;
+    }
+    .copy-btn {
+      background: none;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 3px 7px;
+      font-size: 0.7rem;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      font-family: inherit;
+      flex-shrink: 0;
+    }
+    .copy-btn:hover { background: #e2e8f0; color: #1a202c; }
+    .copy-btn.copied { background: #dcfce7; border-color: #86efac; color: #166534; }
+
+    .desc-cell { color: #374151; }
+    .note-cell { color: #6b7280; font-size: 0.82rem; }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge-m3 { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+    .badge-m5 { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+
+    /* 検索ヒットなし */
+    .no-results {
+      text-align: center;
+      padding: 32px;
+      color: #9ca3af;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .no-results.show { display: block; }
+
+    @media (max-width: 600px) {
+      td, th { padding: 8px 10px; }
+      .note-cell { display: none; }
+      thead th:last-child { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>💻 コマンドリスト</h1>
+  <a class="back-link" href="index.html">← マニュアルポータルに戻る</a>
+</header>
+
+<div class="container">
+
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="コマンド・説明で検索…" oninput="filterRows()">
+  </div>
+
+  <div class="table-section">
+    <table>
+      <thead>
+        <tr>
+          <th>コマンド</th>
+          <th>説明</th>
+          <th>備考</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+
+        <!-- ネットワーク（Windows） -->
+        <tr class="cat-row-tr">
+          <td colspan="3" style="padding:0;">
+            <div class="cat-row cat-network">🌐 ネットワーク（Windows）</div>
+          </td>
+        </tr>
+        <tr data-search="ipconfig ipアドレス確認 ネットワーク windows">
+          <td><div class="cmd-cell"><span class="cmd-text">ipconfig</span><button class="copy-btn" onclick="copyCmd(this,'ipconfig')">コピー</button></div></td>
+          <td class="desc-cell">IPアドレスの確認</td>
+          <td class="note-cell">現在のIPアドレス・サブネットマスク・ゲートウェイを表示</td>
+        </tr>
+        <tr data-search="ipconfig /all 詳細 ネットワーク情報 windows">
+          <td><div class="cmd-cell"><span class="cmd-text">ipconfig /all</span><button class="copy-btn" onclick="copyCmd(this,'ipconfig /all')">コピー</button></div></td>
+          <td class="desc-cell">詳細なネットワーク情報の確認</td>
+          <td class="note-cell">MACアドレス・DHCPサーバーなども含めた詳細情報を表示</td>
+        </tr>
+        <tr data-search="ping 疎通確認 ネットワーク windows 192.168">
+          <td><div class="cmd-cell"><span class="cmd-text">ping 192.168.x.x</span><button class="copy-btn" onclick="copyCmd(this,'ping 192.168.x.x')">コピー</button></div></td>
+          <td class="desc-cell">疎通確認</td>
+          <td class="note-cell">対象IPアドレスと通信できるか確認。x.xは実際のアドレスに変更</td>
+        </tr>
+        <tr data-search="ssh root 192.168 リモート接続 linux サーバー">
+          <td><div class="cmd-cell"><span class="cmd-text">ssh root@192.168.x.x</span><button class="copy-btn" onclick="copyCmd(this,'ssh root@192.168.x.x')">コピー</button></div></td>
+          <td class="desc-cell">サーバーへのSSHリモート接続</td>
+          <td class="note-cell">x.xは接続先サーバーの実際のIPアドレスに変更</td>
+        </tr>
+
+        <!-- ディスク（Linux） -->
+        <tr class="cat-row-tr">
+          <td colspan="3" style="padding:0;">
+            <div class="cat-row cat-disk">💾 ディスク（Linux）</div>
+          </td>
+        </tr>
+        <tr data-search="df ディスク 使用量 linux">
+          <td><div class="cmd-cell"><span class="cmd-text">df</span><button class="copy-btn" onclick="copyCmd(this,'df')">コピー</button></div></td>
+          <td class="desc-cell">ディスク使用量の確認</td>
+          <td class="note-cell">マウントされた全パーティションの使用量をバイト単位で表示</td>
+        </tr>
+        <tr data-search="df -h ディスク 使用量 見やすい linux">
+          <td><div class="cmd-cell"><span class="cmd-text">df -h</span><button class="copy-btn" onclick="copyCmd(this,'df -h')">コピー</button></div></td>
+          <td class="desc-cell">ディスク使用量の確認（見やすい単位）</td>
+          <td class="note-cell">GB・MB など人が読みやすい単位で表示（-h = human-readable）</td>
+        </tr>
+        <tr data-search="du -shc フォルダ サイズ 合計 linux">
+          <td><div class="cmd-cell"><span class="cmd-text">du -shc *</span><button class="copy-btn" onclick="copyCmd(this,'du -shc *')">コピー</button></div></td>
+          <td class="desc-cell">各フォルダのサイズと合計の確認</td>
+          <td class="note-cell">カレントディレクトリ内の各フォルダサイズと総合計を表示</td>
+        </tr>
+
+        <!-- システム（Linux） -->
+        <tr class="cat-row-tr">
+          <td colspan="3" style="padding:0;">
+            <div class="cat-row cat-system">⚙️ システム（Linux）</div>
+          </td>
+        </tr>
+        <tr data-search="top プロセス cpu メモリ linux">
+          <td><div class="cmd-cell"><span class="cmd-text">top</span><button class="copy-btn" onclick="copyCmd(this,'top')">コピー</button></div></td>
+          <td class="desc-cell">プロセス・CPU・メモリ使用状況の確認</td>
+          <td class="note-cell">リアルタイムでシステムリソースの使用状況を表示。終了は「q」キー</td>
+        </tr>
+
+        <!-- ディレクトリ移動（Linux） -->
+        <tr class="cat-row-tr">
+          <td colspan="3" style="padding:0;">
+            <div class="cat-row cat-dir">📂 ディレクトリ移動（Linux）</div>
+          </td>
+        </tr>
+        <tr data-search="cd 移動 絶対パス linux ディレクトリ">
+          <td><div class="cmd-cell"><span class="cmd-text">cd /○○/○○</span><button class="copy-btn" onclick="copyCmd(this,'cd /○○/○○')">コピー</button></div></td>
+          <td class="desc-cell">絶対パスでディレクトリへ移動</td>
+          <td class="note-cell">○○を実際のパスに変更。例：cd /mnt/backup</td>
+        </tr>
+        <tr data-search="cd .. 上 親 ディレクトリ linux">
+          <td><div class="cmd-cell"><span class="cmd-text">cd ..</span><button class="copy-btn" onclick="copyCmd(this,'cd ..')">コピー</button></div></td>
+          <td class="desc-cell">1つ上のディレクトリへ移動</td>
+          <td class="note-cell">現在地の親ディレクトリに移動</td>
+        </tr>
+        <tr data-search="cd ホーム ディレクトリ linux">
+          <td><div class="cmd-cell"><span class="cmd-text">cd</span><button class="copy-btn" onclick="copyCmd(this,'cd')">コピー</button></div></td>
+          <td class="desc-cell">ホームディレクトリへ移動</td>
+          <td class="note-cell">引数なしで実行するとホームディレクトリ（/root など）へ戻る</td>
+        </tr>
+        <tr data-search="pwd 現在 場所 ディレクトリ linux">
+          <td><div class="cmd-cell"><span class="cmd-text">pwd</span><button class="copy-btn" onclick="copyCmd(this,'pwd')">コピー</button></div></td>
+          <td class="desc-cell">現在のディレクトリを表示</td>
+          <td class="note-cell">現在いる場所のフルパスを表示</td>
+        </tr>
+
+        <!-- バックアップ確認（Linux） -->
+        <tr class="cat-row-tr">
+          <td colspan="3" style="padding:0;">
+            <div class="cat-row cat-backup">🗄️ バックアップ・RAID確認（Linux）</div>
+          </td>
+        </tr>
+        <tr data-search="amcli ディスク 状態 確認 m3 サーバー">
+          <td><div class="cmd-cell"><span class="cmd-text">amCLI -l</span><button class="copy-btn" onclick="copyCmd(this,'amCLI -l')">コピー</button></div></td>
+          <td class="desc-cell">ディスク状態の確認</td>
+          <td class="note-cell"><span class="badge badge-m3">M3サーバーのみ</span></td>
+        </tr>
+        <tr data-search="cat /proc/mdstat raid 状態 確認 m5 サーバー">
+          <td><div class="cmd-cell"><span class="cmd-text">cat /proc/mdstat</span><button class="copy-btn" onclick="copyCmd(this,'cat /proc/mdstat')">コピー</button></div></td>
+          <td class="desc-cell">RAID状態の確認</td>
+          <td class="note-cell"><span class="badge badge-m5">M5サーバーのみ</span></td>
+        </tr>
+        <tr data-search="rdiff-backup バックアップ 確認 一覧 m3 サーバー">
+          <td><div class="cmd-cell"><span class="cmd-text">rdiff-backup -l /mnt/backup/○○</span><button class="copy-btn" onclick="copyCmd(this,'rdiff-backup -l /mnt/backup/○○')">コピー</button></div></td>
+          <td class="desc-cell">バックアップ一覧の確認</td>
+          <td class="note-cell"><span class="badge badge-m3">M3サーバーのみ</span>　○○は対象フォルダ名に変更</td>
+        </tr>
+
+      </tbody>
+    </table>
+    <div class="no-results" id="noResults">該当するコマンドが見つかりませんでした。</div>
+  </div>
+
+</div>
+
+<script>
+  function copyCmd(btn, text) {
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = 'コピー済み';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = 'コピー';
+        btn.classList.remove('copied');
+      }, 1500);
+    });
+  }
+
+  function filterRows() {
+    var q = document.getElementById('search').value.trim().toLowerCase();
+    var rows = document.querySelectorAll('#tableBody tr:not(.cat-row-tr)');
+    var catRows = document.querySelectorAll('.cat-row-tr');
+    var anyVisible = false;
+
+    rows.forEach(function(row) {
+      var text = (row.dataset.search || '') + ' ' + row.textContent.toLowerCase();
+      var match = !q || text.includes(q);
+      row.classList.toggle('hidden', !match);
+      if (match) anyVisible = true;
+    });
+
+    // カテゴリー行は検索中は非表示
+    catRows.forEach(function(row) {
+      row.classList.toggle('hidden', !!q);
+    });
+
+    document.getElementById('noResults').classList.toggle('show', !anyVisible && !!q);
+  }
+</script>
+
+</body>
+</html>
