@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>電話対応フロー — PCSサポート</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Hiragino Sans", "Meiryo", sans-serif;
+      background: #f0f4f8;
+      color: #1a202c;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a56db, #1e40af);
+      color: white;
+      padding: 18px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    header h1 { font-size: 1.3rem; font-weight: 700; }
+    .back-link {
+      color: #bfdbfe;
+      font-size: 0.85rem;
+      text-decoration: none;
+    }
+    .back-link:hover { color: white; }
+
+    .notice {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 10px 20px;
+      font-size: 0.82rem;
+      color: #92400e;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 20px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 36px;
+    }
+
+    /* タブ切替 */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 8px 18px;
+      border-radius: 6px 6px 0 0;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 2px solid transparent;
+      background: #e2e8f0;
+      color: #475569;
+      transition: all 0.18s;
+      font-family: inherit;
+    }
+    .tab.active { background: white; color: #1a56db; border-color: #cbd5e1; border-bottom-color: white; }
+
+    .flow-panel { display: none; }
+    .flow-panel.active { display: block; }
+
+    /* フローラッパー */
+    .flow-wrap {
+      background: white;
+      border-radius: 0 12px 12px 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      padding: 28px 24px;
+    }
+
+    /* ステップ */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      width: 100%;
+      position: relative;
+    }
+
+    /* 左側の線とアイコン */
+    .step-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 44px;
+    }
+    .step-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      position: relative;
+      z-index: 1;
+    }
+    .step-line {
+      width: 3px;
+      flex: 1;
+      min-height: 24px;
+      background: #e2e8f0;
+      margin: 4px 0;
+    }
+
+    /* ステップ内容 */
+    .step-body {
+      flex: 1;
+      padding-bottom: 24px;
+    }
+    .step-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step-num {
+      background: #e2e8f0;
+      color: #475569;
+      font-size: 0.7rem;
+      font-weight: 700;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-desc {
+      font-size: 0.83rem;
+      color: #4b5563;
+      line-height: 1.65;
+    }
+    .step-script {
+      margin-top: 8px;
+      background: #f0f9ff;
+      border-left: 3px solid #38bdf8;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      color: #075985;
+      border-radius: 0 6px 6px 0;
+      font-style: italic;
+    }
+    .step-script::before { content: "💬 セリフ例："; font-weight: 700; font-style: normal; display: block; margin-bottom: 2px; color: #0369a1; }
+
+    /* 分岐ブロック */
+    .branch-wrap {
+      width: 100%;
+      padding-bottom: 24px;
+    }
+    .branch-label {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #6b7280;
+      margin-bottom: 10px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .branch-label::before, .branch-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #d1d5db;
+    }
+    .branch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .branch-card {
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+    .branch-card .b-title {
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .branch-ok   { background: #f0fdf4; border: 1.5px solid #86efac; }
+    .branch-ok   .b-title { color: #166534; }
+    .branch-ng   { background: #fff7ed; border: 1.5px solid #fdba74; }
+    .branch-ng   .b-title { color: #9a3412; }
+
+    .path-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #1a56db;
+      text-decoration: none;
+      font-size: 0.8rem;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+    .path-link:hover { text-decoration: underline; }
+
+    /* 色テーマ */
+    .c-blue   { background: #dbeafe; color: #1e40af; }
+    .c-green  { background: #dcfce7; color: #166534; }
+    .c-purple { background: #ede9fe; color: #5b21b6; }
+    .c-orange { background: #ffedd5; color: #9a3412; }
+    .c-pink   { background: #fce7f3; color: #9d174d; }
+    .c-teal   { background: #ccfbf1; color: #134e4a; }
+    .c-red    { background: #fee2e2; color: #991b1b; }
+
+    @media (max-width: 560px) {
+      .branch-grid { grid-template-columns: 1fr; }
+      .flow-wrap { padding: 18px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📞 電話対応フロー</h1>
+  <a class="back-link" href="index.html">← マニュアルポータルに戻る</a>
+</header>
+
+<div class="notice">
+  ⚠️ 対応方法は人によって異なります。このフローはあくまで一例です。
+</div>
+
+<div class="container">
+
+  <!-- タブ -->
+  <div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('pc')">💻 PC設定</button>
+      <button class="tab" onclick="switchTab('all')">🏢 サーバーアクセス不可（社内全体）</button>
+      <button class="tab" onclick="switchTab('single')">🖥️ サーバーアクセス不可（特定PC）</button>
+    </div>
+
+    <!-- フロー①：PC設定 -->
+    <div class="flow-panel active" id="panel-pc">
+      <div class="flow-wrap">
+        <div class="flow">
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-blue">📞</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">1</div>受電 / 架電</div>
+              <div class="step-desc">お客様から電話を受ける、またはこちらから架電する。</div>
+              <div class="step-script">お世話になっております。サーバーサポートの○○です。</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-purple">💻</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">2</div>チームビューアのインストール案内</div>
+              <div class="step-desc">
+                遠隔での設定になることをお伝えし、チームビューアのインストールを案内する。<br>
+                ブラウザを立ち上げていただき、アドレスバーにURLを直接入力 or 検索からインストール。<br>
+                <span style="color:#6b7280;font-size:0.78rem;">※ 案内方法は人によって異なる</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-green">🔗</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">3</div>チームビューア接続</div>
+              <div class="step-desc">IDとパスワードを教えてもらい、チームビューアで接続する。接続完了を確認。</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-orange">🔧</div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">4</div>用途確認と設定</div>
+              <div class="step-desc">
+                サーバーの使用用途を確認してから設定を行う。<br>
+                <br>
+                <strong>確認ポイント：</strong><br>
+                ・社内からのみ使用するのか<br>
+                ・外部（自宅・出先など）からも接続するのか
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- フロー②：社内全体アクセス不可 -->
+    <div class="flow-panel" id="panel-all">
+      <div class="flow-wrap">
+        <div class="flow">
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-blue">📞</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">1</div>受電 / 架電</div>
+              <div class="step-desc">お客様から電話を受ける、またはこちらから架電する。</div>
+              <div class="step-script">お世話になっております。サーバーサポートの○○です。</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-green">🔗</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">2</div>チームビューア接続</div>
+              <div class="step-desc">
+                社内のPC1台に遠隔接続する。<br>
+                <span style="color:#059669;font-weight:700;">できればWindows PC が望ましい。</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-purple">🖥️</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">3</div>cmdで疎通確認</div>
+              <div class="step-desc">
+                コマンドプロンプト（cmd）を立ち上げて、ネットワークの状態を確認する。<br>
+                <br>
+                <code style="background:#f1f5f9;padding:2px 6px;border-radius:3px;font-size:0.82rem;">ipconfig</code> → IPアドレスを確認<br>
+                <code style="background:#f1f5f9;padding:2px 6px;border-radius:3px;font-size:0.82rem;">ping 192.168.x.x</code> → サーバーへの疎通確認
+              </div>
+            </div>
+          </div>
+
+          <!-- 分岐 -->
+          <div class="branch-wrap">
+            <div class="branch-label">pingの結果で分岐</div>
+            <div class="branch-grid">
+              <div class="branch-card branch-ok">
+                <div class="b-title">✅ pingが通る場合</div>
+                SSHでサーバーに接続し、ディスク容量や状態を確認する。<br>
+                <code style="background:#dcfce7;padding:2px 6px;border-radius:3px;font-size:0.78rem;display:inline-block;margin-top:4px;">df -h</code>
+                <code style="background:#dcfce7;padding:2px 6px;border-radius:3px;font-size:0.78rem;display:inline-block;margin-top:4px;">top</code>
+              </div>
+              <div class="branch-card branch-ng">
+                <div class="b-title">❌ pingが飛ばない場合</div>
+                サーバー本体を直接確認する。<br>PCSフロー図を参考に進める。<br>
+                <a class="path-link" href="https://app.diagrams.net/#G1PVk9MWxc42KS6Tp6VstoM0elWvwCmpnq" target="_blank" rel="noopener">
+                  🔗 PCSフロー図を開く
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- フロー③：特定PCのみアクセス不可 -->
+    <div class="flow-panel" id="panel-single">
+      <div class="flow-wrap">
+        <div class="flow">
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-blue">📞</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">1</div>受電 / 架電</div>
+              <div class="step-desc">お客様から電話を受ける、またはこちらから架電する。</div>
+              <div class="step-script">お世話になっております。サーバーサポートの○○です。</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-green">🔗</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">2</div>対象PCにチームビューア接続</div>
+              <div class="step-desc">アクセスできないと報告のあった特定のPCにチームビューアで接続する。</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-orange">🔑</div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">3</div>資格情報の確認・設定</div>
+              <div class="step-desc">
+                資格情報が正しく設定されているか確認し、必要に応じて追加する。<br>
+                <br>
+                <strong>手順：</strong><br>
+                ① コントロールパネルを開く<br>
+                ② ユーザーアカウント<br>
+                ③ 資格情報マネージャー<br>
+                ④ Windows資格情報<br>
+                ⑤「Windows資格情報の追加」からサーバーのアドレス・ユーザー名・パスワードを入力
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function switchTab(id) {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.flow-panel').forEach(function(p) { p.classList.remove('active'); });
+    event.target.classList.add('active');
+    document.getElementById('panel-' + id).classList.add('active');
+  }
+</script>
+
+</body>
+</html>
