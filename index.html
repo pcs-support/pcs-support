@@ -236,16 +236,33 @@
 <div id="pwOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center;">
   <div style="background:white;border-radius:14px;padding:32px 28px;width:100%;max-width:340px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
     <div style="font-weight:700;font-size:1rem;margin-bottom:6px;" id="pwTitle"></div>
-    <div style="font-size:0.82rem;color:#64748b;margin-bottom:18px;">パスワードを入力してください</div>
-    <input type="password" id="pwInput" placeholder="パスワード"
-      style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:8px;font-size:0.95rem;outline:none;font-family:inherit;margin-bottom:10px;"
-      onkeydown="if(event.key==='Enter')checkPw()">
-    <div id="pwError" style="display:none;color:#dc2626;font-size:0.82rem;margin-bottom:10px;">パスワードが正しくありません。</div>
-    <div style="display:flex;gap:10px;">
-      <button onclick="checkPw()"
-        style="flex:1;padding:10px;background:linear-gradient(135deg,#1a56db,#1e40af);color:white;font-weight:700;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-family:inherit;">確認</button>
-      <button onclick="closePw()"
-        style="flex:1;padding:10px;background:#f1f5f9;color:#475569;font-weight:700;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-family:inherit;">キャンセル</button>
+
+    <!-- パスワード入力フォーム -->
+    <div id="pwForm">
+      <div style="font-size:0.82rem;color:#64748b;margin-bottom:18px;">パスワードを入力してください</div>
+      <input type="password" id="pwInput" placeholder="パスワード"
+        style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:8px;font-size:0.95rem;outline:none;font-family:inherit;margin-bottom:10px;"
+        onkeydown="if(event.key==='Enter')checkPw()">
+      <div id="pwError" style="display:none;color:#dc2626;font-size:0.82rem;margin-bottom:10px;">パスワードが正しくありません。</div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="checkPw()"
+          style="flex:1;padding:10px;background:linear-gradient(135deg,#1a56db,#1e40af);color:white;font-weight:700;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-family:inherit;">確認</button>
+        <button onclick="closePw()"
+          style="flex:1;padding:10px;background:#f1f5f9;color:#475569;font-weight:700;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-family:inherit;">キャンセル</button>
+      </div>
+    </div>
+
+    <!-- 認証成功後の表示 -->
+    <div id="pwSuccess" style="display:none;text-align:center;">
+      <div style="font-size:0.82rem;color:#64748b;margin-bottom:18px;">認証できました。下のボタンからマニュアルを開いてください。</div>
+      <div style="display:flex;gap:10px;">
+        <a id="pwOpenLink" href="#" target="_blank" rel="noopener" onclick="closePw()"
+          style="flex:1;padding:10px;background:linear-gradient(135deg,#059669,#047857);color:white;font-weight:700;border-radius:8px;cursor:pointer;font-size:0.9rem;font-family:inherit;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;">
+          &#x1F4C4; マニュアルを開く
+        </a>
+        <button onclick="closePw()"
+          style="flex:1;padding:10px;background:#f1f5f9;color:#475569;font-weight:700;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-family:inherit;">閉じる</button>
+      </div>
     </div>
   </div>
 </div>
@@ -376,8 +393,9 @@
     var input = document.getElementById('pwInput').value;
     if (input === currentCard.dataset.pw) {
       sessionStorage.setItem('pw_' + currentCard.dataset.pwkey, '1');
-      closePw();
-      window.open(pendingUrl, '_blank', 'noopener');
+      document.getElementById('pwOpenLink').href = pendingUrl;
+      document.getElementById('pwForm').style.display = 'none';
+      document.getElementById('pwSuccess').style.display = 'block';
     } else {
       document.getElementById('pwError').style.display = 'block';
       document.getElementById('pwInput').value = '';
@@ -387,6 +405,10 @@
 
   function closePw() {
     document.getElementById('pwOverlay').style.display = 'none';
+    document.getElementById('pwForm').style.display = 'block';
+    document.getElementById('pwSuccess').style.display = 'none';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwError').style.display = 'none';
     pendingUrl = null;
     currentCard = null;
   }
