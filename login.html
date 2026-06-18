@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ログイン — PCSサポート</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Hiragino Sans", "Meiryo", sans-serif;
+      background: #f0f4f8;
+      color: #1a202c;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+      padding: 40px 36px 36px;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .logo-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #1a56db, #1e40af);
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 12px;
+    }
+    .logo h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e40af;
+    }
+    .logo p {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: #1a202c;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #f8fafc;
+    }
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      border-color: #1a56db;
+      background: white;
+    }
+
+    .error-msg {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      color: #dc2626;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #1a56db, #1e40af);
+      color: white;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.15s, transform 0.1s;
+      margin-top: 4px;
+    }
+    .submit-btn:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-card">
+  <div class="logo">
+    <div class="logo-icon">📋</div>
+    <h1>PCSサポート</h1>
+    <p>マニュアルポータル</p>
+  </div>
+
+  <form id="loginForm" onsubmit="doLogin(event)">
+    <div class="form-group">
+      <label for="username">ユーザー名</label>
+      <input type="text" id="username" placeholder="ユーザー名を入力" autocomplete="username" autofocus>
+    </div>
+    <div class="form-group">
+      <label for="password">パスワード</label>
+      <input type="password" id="password" placeholder="パスワードを入力" autocomplete="current-password">
+    </div>
+    <div class="error-msg" id="errorMsg">ユーザー名またはパスワードが正しくありません。</div>
+    <button type="submit" class="submit-btn">ログイン</button>
+  </form>
+</div>
+
+<p class="footer-note">© PCSサポート</p>
+
+<script>
+  // すでにログイン済みならポータルへ
+  if (sessionStorage.getItem('pcs_auth') === '1') {
+    location.href = 'index.html';
+  }
+
+  function doLogin(e) {
+    e.preventDefault();
+    var user = document.getElementById('username').value;
+    var pass = document.getElementById('password').value;
+    var err  = document.getElementById('errorMsg');
+
+    if (user === 'admin' && pass === 'p@55w0rd') {
+      sessionStorage.setItem('pcs_auth', '1');
+      location.href = 'index.html';
+    } else {
+      err.classList.add('show');
+      document.getElementById('password').value = '';
+      document.getElementById('password').focus();
+    }
+  }
+</script>
+
+</body>
+</html>
