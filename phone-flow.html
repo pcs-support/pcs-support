@@ -301,6 +301,7 @@
       <button class="tab active" onclick="switchTab('pc')">💻 PC設定</button>
       <button class="tab" onclick="switchTab('all')">🏢 サーバーアクセス不可（社内全体）</button>
       <button class="tab" onclick="switchTab('single')">🖥️ サーバーアクセス不可（特定PC）</button>
+      <button class="tab" onclick="switchTab('vpnslow')">🐢 VPNが遅い（M5のみ）</button>
     </div>
 
     <!-- フロー①：PC設定 -->
@@ -478,6 +479,201 @@
                 <a class="path-link" href="https://app.diagrams.net/#G1PVk9MWxc42KS6Tp6VstoM0elWvwCmpnq" target="_blank" rel="noopener">
                   🔗 PCSフロー図を開く
                 </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- フロー④：VPNが遅い -->
+    <div class="flow-panel" id="panel-vpnslow">
+      <div class="flow-wrap">
+        <div class="flow">
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-blue">🔍</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">2</div>症状確認</div>
+              <div class="step-desc">
+                VPN越しでサーバー内のファイルが開くのが遅い等、症状を確認する。
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-red">⚠️</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">3</div>バージョン確認（M5 v1.3より前の場合）</div>
+              <div class="step-desc">
+                対象サーバーが <strong>M5 v1.3より前</strong> の場合、BIOS設定変更の追加作業が必要。<br>
+                <span style="color:#991b1b;font-weight:700;">モニター・キーボード・マウスが必要となる。</span>
+              </div>
+              <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#fee2e2;border:1.5px solid #fca5a5;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#991b1b;">
+                  <span style="font-weight:700;color:#b91c1c;flex-shrink:0;">①</span>
+                  <span>サーバーをシャットダウンする</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#fee2e2;border:1.5px solid #fca5a5;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#991b1b;">
+                  <span style="font-weight:700;color:#b91c1c;flex-shrink:0;">②</span>
+                  <span>電源ボタンを押して <strong>ESCを長押し</strong> → BIOS画面を起動</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#fee2e2;border:1.5px solid #fca5a5;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#991b1b;">
+                  <span style="font-weight:700;color:#b91c1c;flex-shrink:0;">③</span>
+                  <span><strong>Advanced</strong> → <strong>Onboard Devices Configuration</strong> → <strong>LAN2 Controller</strong> → <strong>Enabled</strong></span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#fee2e2;border:1.5px solid #fca5a5;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#991b1b;">
+                  <span style="font-weight:700;color:#b91c1c;flex-shrink:0;">④</span>
+                  <span><strong>F4</strong> を押して → <strong>Enter</strong> で保存して再起動</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-teal">🔌</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">4</div>LANケーブル2本差しご案内</div>
+              <div class="step-desc">
+                サーバーの後ろにあるLANポートに追加で差してもらう。
+              </div>
+              <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#134e4a;">
+                  <span style="font-weight:700;color:#0d9488;flex-shrink:0;">①</span>
+                  <span>サーバー背面のLANポートを確認し、<strong>1本目のLANの下のポート</strong>に2本目を差す</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#134e4a;">
+                  <span style="font-weight:700;color:#0d9488;flex-shrink:0;">②</span>
+                  <span>1本目と<strong>同じルーターまたはHub</strong>に接続する</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#fff7ed;border:1.5px solid #fdba74;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#9a3412;">
+                  <span style="font-weight:700;color:#c2410c;flex-shrink:0;">③</span>
+                  <span>2本差し後、<strong>設定変更が必要</strong>なので遠隔（ローカルPC）で操作させていただく旨を伝える</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-green">🔗</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">5</div>チームビューア接続（LAN2本差し後）</div>
+              <div class="step-desc">
+                LAN2本差し完了後、チームビューアで接続する。<br>
+                下記リンクから <strong>SoftEther VPN Bridge</strong> をダウンロードしてもらう。
+              </div>
+              <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#134e4a;">
+                  <span style="font-weight:700;color:#0d9488;flex-shrink:0;">①</span>
+                  <span>
+                    <a href="https://www.softether-download.com/ja.aspx?product=softether" target="_blank" rel="noopener" style="color:#1a56db;font-weight:700;">SoftEther ダウンロードページ</a> を開く
+                  </span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#134e4a;">
+                  <span style="font-weight:700;color:#0d9488;flex-shrink:0;">②</span>
+                  <span>コンポーネント：<strong>SoftEther VPN Bridge</strong></span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#134e4a;">
+                  <span style="font-weight:700;color:#0d9488;flex-shrink:0;">③</span>
+                  <span>プラットフォーム：<strong>Windows</strong></span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#134e4a;">
+                  <span style="font-weight:700;color:#0d9488;flex-shrink:0;">④</span>
+                  <span>ダウンロード可能なファイルの<strong>一番上</strong>をクリックしてダウンロード</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-purple">⚙️</div>
+              <div class="step-line"></div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">6</div>セットアップ</div>
+              <div class="step-desc">
+                インストーラーを起動し、ソフトを選ぶ画面で一番下の項目を選択する。
+              </div>
+              <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#134e4a;">
+                  <span style="font-weight:700;color:#0d9488;flex-shrink:0;">①</span>
+                  <span>ダウンロードしたソフトを起動し、選択画面で一番下の <strong>「SoftEther VPN サーバー管理マネージャー」</strong> を選択して進む</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-orange">🔧</div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">7</div>設定変更</div>
+              <div class="step-desc">インストール後にアプリが自動起動するので、以下の手順で設定を変更する。</div>
+              <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#134e4a;">
+                  <span style="font-weight:700;color:#0d9488;flex-shrink:0;">①</span>
+                  <span><strong>「新しい接続設定」</strong> をクリック</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#134e4a;">
+                  <span style="font-weight:700;color:#0d9488;flex-shrink:0;">②</span>
+                  <span>接続設定名・ホスト名にサーバーのホストIP（<code style="background:#dcfce7;padding:1px 5px;border-radius:3px;">192.168.x.x</code>）を入力して <strong>「OK」</strong> で接続</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#134e4a;">
+                  <span style="font-weight:700;color:#0d9488;flex-shrink:0;">③</span>
+                  <span>パスワード入力を求められたら <code style="background:#dcfce7;padding:1px 5px;border-radius:3px;font-style:normal;">p@55word!3</code> を入力</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#134e4a;">
+                  <span style="font-weight:700;color:#0d9488;flex-shrink:0;">④</span>
+                  <span>アクセス後、<strong>「ローカルブリッジ設定」</strong> をクリック</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#134e4a;">
+                  <span style="font-weight:700;color:#0d9488;flex-shrink:0;">⑤</span>
+                  <span>上の表でブリッジ先が <strong>「br0」</strong> になっている行を選択し、<strong>「ローカルブリッジの削除」</strong> をクリック</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#134e4a;">
+                  <span style="font-weight:700;color:#0d9488;flex-shrink:0;">⑥</span>
+                  <span>新しいローカルブリッジの定義で仮想HUBを <strong>「VPN」</strong> に選択</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#f0fdfa;border:1.5px solid #99f6e4;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#134e4a;">
+                  <span style="font-weight:700;color:#0d9488;flex-shrink:0;">⑦</span>
+                  <span>LANカードを <strong>「eno2」</strong> に選択して <strong>「ローカルブリッジを追加」</strong> をクリック</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:8px;background:#fff7ed;border:1.5px solid #fdba74;border-radius:7px;padding:9px 12px;font-size:0.83rem;color:#9a3412;">
+                  <span style="font-weight:700;color:#c2410c;flex-shrink:0;">⑧</span>
+                  <span>上の表に追加されるので、<strong>状態が「動作中」になっているか</strong>確認する</span>
+                </div>
+              </div>
+              <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px;">
+                <div style="font-size:0.8rem;font-weight:700;color:#6b7280;margin-bottom:2px;">📚 関連マニュアル</div>
+                <a href="https://docs.google.com/spreadsheets/d/1JaVObpnlKsNq8ShJwy46oeIqbQbt7MVnIgRvBZ6kns8/edit?gid=1345052536#gid=1345052536" target="_blank" rel="noopener" class="path-link">📄 関連ナレッジ</a>
+                <a href="https://docs.google.com/document/d/1QQ3ROVEU0YiAtuaCZx_pfsX90WX99g29/edit" target="_blank" rel="noopener" class="path-link">📄 関連マニュアル</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-left">
+              <div class="step-icon c-green">✅</div>
+            </div>
+            <div class="step-body">
+              <div class="step-title"><div class="step-num">7</div>速度改善の確認</div>
+              <div class="step-desc">
+                全ての設定変更が完了したら、お客様にVPN越しでのファイルアクセス速度が改善されたか確認していただく。
               </div>
             </div>
           </div>
